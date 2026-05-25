@@ -19,6 +19,8 @@ export const theme = {
             headerColor: "#ffffff",
             headerSortActiveBg: "#264d7a",
             headerSortHoverBg: "#254670",
+            headerIconColor: "#ffffff",
+            headerIconHoverColor: "#ffffff",
             rowHoverBg: "#e6f4ff",
             cellPaddingBlock: 6,
             cellPaddingInline: 10,

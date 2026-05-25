@@ -7,7 +7,7 @@ function Home() {
         <Card>
             <Title level={2}>Тестове завдання</Title>
             <Paragraph type="secondary">
-                Стек: React + Vite + Ant Design + React Router.
+                Стек: React + Vite + Ant Design + React Router + Axios.
             </Paragraph>
         </Card>
     );
