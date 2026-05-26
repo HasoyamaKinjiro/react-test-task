@@ -1,34 +1,19 @@
-import { Avatar, Flex, Table, Tooltip, Typography } from "antd";
+import { Avatar, Flex, Table, Tooltip, Typography, Skeleton } from "antd";
+import { COINS_SORT_KEY_MAP, TABLE_SKELETON_ROWS } from "../config/constants.js";
+import { fmtCompact, fmtPercent, fmtPrice } from "../config/helpers.jsx";
+import { useTableSort } from "../hooks/useTableSort.js";
+
 const { Text } = Typography;
 
-const fmtPrice = (v) =>
-    "$" + Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const SKELETON_ROWS = Array.from({ length: TABLE_SKELETON_ROWS }, (_, i) => ({ id: `skeleton-${i}` }));
 
-const fmtPercent = (v) => {
-    const fixed = Number(v).toFixed(2) + "%";
-    return (
-        <Text style={{ color: v >= 0 ? "#52c41a" : "#f5222d" }}>
-            {v >= 0 ? "+" : ""}
-            {fixed}
-        </Text>
-    );
-};
-
-const fmtCompact = (v) => {
-    if (v >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T";
-    if (v >= 1e9)  return "$" + (v / 1e9).toFixed(2) + "B";
-    if (v >= 1e6)  return "$" + (v / 1e6).toFixed(2) + "M";
-    return "$" + Number(v).toLocaleString("en-US");
-};
-
-const columns = [
+const buildColumns = (sortField, sortOrder) => [
     {
         title: "#",
         dataIndex: "market_cap_rank",
         key: "rank",
         width: 60,
-        sorter: (a, b) => a.market_cap_rank - b.market_cap_rank,
-        defaultSortOrder: "ascend",
+        sorter: true,
     },
     {
         title: "Name",
@@ -38,7 +23,7 @@ const columns = [
             <Flex align="center" gap={10}>
                 <Avatar src={record.image} size={24} />
                 <Tooltip title={name}>
-                    <Text ellipsis style={{ maxWidth: 160 }}>{name}</Text>
+                    <Text ellipsis style={{ maxWidth: 154 }}>{name}</Text>
                 </Tooltip>
                 <Text type="secondary">
                     {record.symbol.toUpperCase()}
@@ -52,7 +37,7 @@ const columns = [
         key: "price",
         align: "right",
         render: fmtPrice,
-        sorter: (a, b) => a.current_price - b.current_price,
+        sorter: true,
     },
     {
         title: "24h %",
@@ -60,8 +45,7 @@ const columns = [
         key: "change24h",
         align: "right",
         render: fmtPercent,
-        sorter: (a, b) =>
-            a.price_change_percentage_24h - b.price_change_percentage_24h,
+        sorter: true,
     },
     {
         title: "Market Cap",
@@ -69,7 +53,7 @@ const columns = [
         key: "marketCap",
         align: "right",
         render: fmtCompact,
-        sorter: (a, b) => a.market_cap - b.market_cap,
+        sorter: true,
     },
     {
         title: "Volume 24h",
@@ -77,22 +61,53 @@ const columns = [
         key: "volume",
         align: "right",
         render: fmtCompact,
-        sorter: (a, b) => a.total_volume - b.total_volume,
+        sorter: true,
     },
-];
+].map((col) => ({
+    ...col,
+    sortOrder: col.key === sortField ? sortOrder : null,
+    ...(col.sorter && { sortDirections: ["ascend", "descend", "ascend"] }),
+}));
 
-function CoinsTable({ data }) {
+const skeletonColumns = (sortField, sortOrder) =>
+    buildColumns(sortField, sortOrder).map((col) => ({
+        ...col,
+        render: () => <Skeleton.Button size="small" block={true}/>,
+        sorter: false,
+    }));
+
+function CoinsTable({ data, loading = false }) {
+    const { sortField, sortOrder, handleTableChange } = useTableSort();
+
+    const isSkeletonMode = loading && !data?.length;
+
+    const sortedData = (() => {
+        if (!data?.length || !sortField) return data;
+
+        const field = COINS_SORT_KEY_MAP[sortField];
+
+        if (!field) return data;
+
+        return [...data].sort((a, b) =>
+            sortOrder === "ascend" ? a[field] - b[field] : b[field] - a[field]
+        );
+    })();
+
     return (
-        <div>
-            <Table
-                rowKey="id"
-                dataSource={data}
-                columns={columns}
-                pagination={false}
-                sticky
-                size="middle"
-            />
-        </div>
+        <Table
+            rowKey="id"
+            dataSource={isSkeletonMode ? SKELETON_ROWS : sortedData}
+            columns={
+                isSkeletonMode
+                    ? skeletonColumns(sortField, sortOrder)
+                    : buildColumns(sortField, sortOrder)
+            }
+            sticky
+            size="middle"
+            loading={loading}
+            onChange={handleTableChange}
+            pagination={false}
+        />
     );
 }
 
