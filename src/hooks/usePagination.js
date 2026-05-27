@@ -16,7 +16,7 @@ export const usePagination = ({ totalPages, perPage } = {}) => {
     return {
         page,
         handlePageChange,
-        ...(totalPages != null && perPage != null && {
+        ...(totalPages && perPage && {
             total: totalPages * perPage,
             perPage,
         })

@@ -6,6 +6,7 @@ export const theme = {
     components: {
         Layout: {
             headerBg: "#1d3557",
+            footerBg: "#fff"
         },
 
         Button: {
@@ -28,6 +29,11 @@ export const theme = {
             cellPaddingInlineMD: 10,
             cellPaddingBlockSM: 4,
             cellPaddingInlineSM: 8,
+        },
+
+        Segmented: {
+            itemSelectedBg: "#e6f4ff",
+            itemSelectedColor: "#1677ff"
         },
     },
 };

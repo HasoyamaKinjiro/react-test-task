@@ -12,3 +12,9 @@ export const COINS_SORT_KEY_MAP = {
     marketCap: "market_cap",
     volume:    "total_volume",
 };
+
+export const CHART_COINS = [
+    { label: "Bitcoin",  value: "bitcoin" },
+    { label: "Ethereum", value: "ethereum" },
+    { label: "Dogecoin", value: "dogecoin" },
+];
