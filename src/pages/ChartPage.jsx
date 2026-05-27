@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Flex, Segmented, Button, Spin, Alert, Typography } from "antd";
+import { useEffect, useState } from "react";
+import { Flex, Segmented, Button, Spin, Typography } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import CoinsChart from "../components/CoinsChart";
 import { useCoinChart } from "../hooks/useCoinChart";
+import { useNotification } from "../hooks/useNotification.js";
 import { CHART_COINS } from "../config/constants.js";
 
 const { Title } = Typography;
@@ -10,6 +11,11 @@ const { Title } = Typography;
 function ChartPage() {
     const [coinId, setCoinId] = useState("bitcoin");
     const { data, isLoading, isFetching, isError, error, refetch } = useCoinChart(coinId);
+    const { notifyError } = useNotification();
+
+    useEffect(() => {
+        if (isError) notifyError("Failed to load chart", error?.message);
+    }, [isError, error?.message, notifyError]);
 
     const chartData = (() => {
         const raw = data?.prices?.map(([ts, price]) => ({
@@ -41,8 +47,6 @@ function ChartPage() {
                     </Button>
                 </Flex>
             </Flex>
-
-            {isError && <Alert type="error" title={error.message} />}
 
             <Spin spinning={isLoading} size="large">
                 <CoinsChart data={chartData} />

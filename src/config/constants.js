@@ -18,3 +18,12 @@ export const CHART_COINS = [
     { label: "Ethereum", value: "ethereum" },
     { label: "Dogecoin", value: "dogecoin" },
 ];
+
+export const WIZARD_FORM_COUNTRIES = [
+    { label: "Ukraine",        value: "ukraine" },
+    { label: "United States",  value: "usa" },
+    { label: "Germany",        value: "germany" },
+    { label: "Poland",         value: "poland" },
+    { label: "France",         value: "france" },
+    { label: "United Kingdom", value: "uk" },
+];
